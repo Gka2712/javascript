@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ball Drop</title>
+<style>
+    .titlepos{
+        margin-top:3%;
+        text-align: center;
+        font-size:30px;
+    }
+    .btnpos{
+        margin-top:30px;
+        margin-left:500px;
+    }
+    .block{
+        border:solid 1px #000;
+        width:80px;
+        height:80px;
+    }
+    .row{
+        display:flex;
+    }
+    #container {
+        position: relative;
+        margin-top:40px;
+        margin-left:20%;
+        padding-left:100px;
+        width: 900px;
+        height: 700px;
+        border: 1px solid black;
+    }
+    .statusdis{
+        position:absolute;
+        font-size:200%;
+        margin-left:40%;
+    }
+    .framepos{
+        margin-top:100px;
+    }
+    .ball {
+        position: absolute;
+        width: 50px;
+        height: 50px;
+        background-color: red;
+        border-radius: 50%;
+        transition: top 1s;
+    }
+    .ball2{
+        position:absolute;
+        width:50px;
+        height:50px;
+        background-color:yellow;
+        border-radius:50%;
+        transition:top 1s;
+    }
+</style>
+</head>
+<body>
+    <div class="titlepos">四目並べ</div>
+    <button class="btnpos btngamesetdisable" onclick="dropAction(1)">1</button>
+    <button class="btngamesetdisable" onClick="dropAction(2)">2</button>
+    <button class="btngamesetdisable" onClick="dropAction(3)">3</button>
+    <button class="btngamesetdisable" onClick="dropAction(4)">4</button>
+    <button class="btngamesetdisable" onClick="dropAction(5)">5</button>
+    <button class="btngamesetdisable"onClick="dropAction(6)">6</button>
+    <button class="btngamesetdisable"onClick="dropAction(7)">7</button>
+    <button class="btngamesetdisable"onClick="dropAction(0)">パス</button>
+    <button onClick="resetGame()">リセット</button>
+    <div id="statusdisplay"class="statusdis">gamestart</div>
+    <div id="container">
+    
+        <div id="frame" class="framepos"></div>
+    </div>
+<script>
+    var ballCount = [0, 0, 0, 0, 0, 0, 0]; // 各列のボールの数を管理する配列
+    const frame = document.getElementById('frame');
+    const numRows = 6;
+    const numCols = 7;
+    var board=Array.from({length:numCols},()=>Array(numRows).fill(0));
+    const blockWidth = 80;
+
+    for (let i = 0; i < numRows; i++) {
+        const row = document.createElement('div');
+        row.classList.add('row');
+        for (let j = 0; j < numCols; j++) {
+            const block = document.createElement('div');
+            block.classList.add('block');
+            row.appendChild(block);
+        }
+        container.appendChild(row);
+    }
+    function dropAction(intruction){
+        if(intruction>0){
+            dropNewBall(intruction-1).then(()=>{
+                dropAIBall().then(()=>{
+                    console.log(board);
+                });
+            });
+        }
+        else{
+            dropAIBall().then(()=>{
+                console.log(board);
+            });
+        }
+        
+    }
+    function CheckWin(player){
+        let count=0;
+        for(let row=0;row<numRows;row++){
+            count=0;
+            for(let cols=0;cols<numCols;cols++){
+                if(board[cols][row]===player){
+                    count++;
+                }
+                else{
+                    count=0;
+                }
+                if(count>=4){
+                    return true;
+                }
+            }
+        }
+        for(let col=0;col<numCols;col++){
+            count=0;
+            for(let rows=0;rows<numRows;rows++){
+                if(board[col][rows]===player){
+                    count++;
+                }
+                else{
+                    count=0;
+                }
+                if(count>=4){
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+    function dropNewBall(colIndex) {
+        return new Promise((resolve,reject)=>{
+            if(ballCount[colIndex]>=6){
+                return;
+            }
+            var ball = document.createElement("div");
+            ball.className = "ball";
+            ball.style.top = "0px";
+            ball.style.left = ((colIndex+1) * blockWidth + 40) + "px"; // 列の中央に配置
+            container.appendChild(ball);
+            board[colIndex][ballCount[colIndex]]=1;
+            ballCount[colIndex]++; // 対応する列のボールの数を更新
+            // ボールを落とすアニメーション
+            var dropInterval = setInterval(function() {
+                var currentTop = parseFloat(ball.style.top);
+                var newBallTop = container.clientHeight - 80 * ballCount[colIndex] - 100;
+                if (currentTop < newBallTop) {
+                    ball.style.top = (currentTop + 1) + "px";
+                } else {
+                    clearInterval(dropInterval); // 到達したらアニメーションを停止
+                    if(CheckWin(1)){
+                        console.log("player win");
+                        document.getElementById("statusdisplay").textContent="You wins!";
+                        document.querySelectorAll(".btngamesetdisable").forEach(button=>button.disabled=true);
+
+                    }
+                    else{
+                        resolve();
+                    }
+                }
+            }, 10);
+        });
+        
+    }
+    function dropAIBall(){
+        return new Promise(resolve=>{
+            var randomball = Math.floor(Math.random() * 7);
+            var ballC = false;
+            var pos;
+            for (var i = 0; i < 7; i++) {
+                pos = (randomball + i) % 7;
+                if (ballCount[pos] < 6) { 
+                    ballC = true;
+                    break;
+                }
+            }
+            if (!ballC) {
+                resolve();
+                return;
+            }
+            var ball2 = document.createElement("div");
+            ball2.className = "ball2";
+            ball2.style.top = "0px";
+            ball2.style.left = ((pos + 1) * blockWidth + 40) + "px";
+            container.appendChild(ball2);
+            board[pos][ballCount[pos]]=2;
+            ballCount[pos]++;
+            var dropInterval = setInterval(function() {
+                var currentTop = parseFloat(ball2.style.top);
+                var newBallTop = container.clientHeight - 80 * ballCount[pos] - 100;
+                if (currentTop < newBallTop) {
+                    ball2.style.top = (currentTop + 1) + "px";
+                } else {
+                    clearInterval(dropInterval);
+                    if(CheckWin(2)){
+                        console.log("AI wins");
+                        document.getElementById("statusdisplay").textContent="AI wins!";
+                        document.querySelectorAll(".btngamesetdisable").forEach(button=>button.disabled=true);
+                    }
+                    else{
+                        resolve();
+                    }
+                }
+            }, 10);
+        });
+    }
+    function resetGame() {
+        // すべてのボールを削除
+        document.querySelectorAll('.ball, .ball2').forEach(ball => ball.remove());
+        document.querySelectorAll(".btngamesetdisable").forEach(button=>button.disabled=false);
+        for(let i=0;i<board.length;i++){
+            board[i].fill(0);
+        }
+        // ballCount 配列をリセット
+        ballCount.fill(0);
+    }
+</script>
+</body>
+</html>

@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>number sort puzzle</title>
+        <style>
+            .titlepos{
+                margin-top:5%;
+                margin-left:20%;
+                font-size:50px;
+            }
+            .buttonpos{
+                margin-left:25%;
+            }
+            .button{
+                height:2%;
+                width:2%;
+            }
+            .textpos{
+                margin-left:22%;
+                font-size:20px;
+            }
+            #container {
+                position: relative;
+                margin-top: 40px;
+                margin-left: 20%;
+                padding-left: 50px;
+                width: 1000px;
+                height: 700px;
+                border: 1px solid black;
+                display: flex;
+            }
+            .poll {
+                position: relative;
+                border: solid 1px #000;
+                margin-top: 350px;
+                margin-left: 25px;
+                width: 80px;
+                height: 300px;
+                display: flex;
+                flex-direction: column;
+                justify-content:flex-end;
+                align-items: center; /* Center balls horizontally */
+            }
+            .ball {
+                width: 40px;  /* Diameter of the ball */
+                height: 40px; /* Diameter of the ball */
+                background-color: red; /* Color of the ball */
+                border-radius: 50%; /* Make it a circle */
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                color: white; /* Text color */
+                font-weight: bold; /* Text weight */
+                font-size: 14px; /* Text size */
+                margin-top:20px;
+                transition: top 1s;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="titlepos">Number Sort Puzzle</div>
+        <div class="textpos" id="textpos"></div>
+        <div id="btcon">
+            <button class="buttonpos button" onClick="buttonAction(1)">1</button>
+            <button class="button" onClick="buttonAction(2)">2</button>
+            <button class="button" onClick="buttonAction(3)">3</button>
+            <button class="button" onClick="buttonAction(4)">4</button>
+            <button class="button" onClick="buttonAction(5)">5</button>
+            <button class="button" onClick="buttonAction(6)">6</button>
+            <button class="button" onClick="buttonAction(7)">7</button>
+            <button class="button" onClick="buttonAction(8)">8</button>
+        </div>
+        
+        <div id="container"></div>
+        <script>
+            const container = document.getElementById('container');
+            const btcon=document.getElementById("btcon");
+            const textpos=document.getElementById("textpos");
+            const count = 8;
+            let bt=0;
+            let getvalue=0;
+            let clear=0;
+            let bnumber=[0,0,0,0,0,0];
+            var bnum=Array.from({length:6},()=>Array(4).fill(0));
+            const polls=[];
+            for(let i=0;i<6;i++){
+                for(let j=0;j<4;j++){
+                    var random=Math.floor(Math.random()*6);
+                    for(let k=0;k<6;k++){
+                        if(bnumber[(random+k)%6]<4){
+                            bnumber[(random+k)%6]+=1;
+                            bnum[i][j]=(random+k)%6;
+                            break;
+                        }
+                    }
+                }
+            }
+            for (let i = 0; i < count; i++) {
+                const poll = document.createElement('div');
+                poll.classList.add('poll');
+                for (let j = 0; j < 4; j++) {
+                    if(i<count-2){
+                        const ball = document.createElement('div');
+                        ball.classList.add('ball');
+                        ball.textContent = bnum[i][j]+1; 
+                        ball.style.top='${350+j*40}';
+                        poll.appendChild(ball);
+                    }
+                }
+                container.appendChild(poll);
+                polls.push(poll);
+            }
+            console.log(polls);
+            function buttonAction(intruction){
+                if(bt%2==0){
+                    UpAction(intruction);
+                }
+                else{
+                    dropAction(intruction)
+                }
+
+            }
+            function dropAction(intruction){
+                console.log("こちらはdropActionです");
+                textpos.textContent="";
+                const poll=polls[intruction-1];
+                if(poll.children.length<4){
+                    var newball=document.createElement("div");
+                    newball.className="ball";
+                    newball.style.position="absolute";
+                    newball.textContent=getvalue;
+                    container.appendChild(newball);
+                    var currentTop=-50;
+                    var currentLeft=(105*(intruction-1))+100;
+                    var newballTop=300;
+                    newball.style.top=`${currentTop}px`;
+                    newball.style.left=`${currentLeft}px`;
+                    var dropInterval=setInterval(function(){
+                        if(currentTop<newballTop){
+                            currentTop+=2;
+                            newball.style.top=`${currentTop}px`;
+                        }else{
+                            clearInterval(dropInterval);
+                            newball.remove();
+                            const ball=document.createElement("div");
+                            ball.classList.add('ball');
+                            ball.textContent=getvalue;
+                            const newTop=300-(poll.children.length+1)*40;
+                            ball.style.top=`${newTop}px`;
+                            poll.appendChild(ball);
+                            if(poll.children.length>0){
+                                poll.insertBefore(ball,poll.firstChild);
+                            }
+                            else{
+                                poll.appendChild(ball);
+                            }
+                            bt+=1;
+                            if(poll.children.length==4){
+                                balljudge(intruction);
+                            }
+                        }
+                    },50);
+                }
+                else{
+                    textpos.textContent=intruction+"番目のポールにはもうポールを入れることができません"
+                }
+                
+            }
+            function UpAction(intruction){
+                console.log("こちらはUpActionです");
+                const poll=polls[intruction-1];
+                if(poll.children.length>0){
+                    textpos.textContent="";
+                    var ball=poll.removeChild(poll.children[0]);
+                    getvalue=ball.textContent;
+                    const containerRect=container.getBoundingClientRect();
+                    var newball=document.createElement("div");
+                    newball.className="ball";
+                    newball.style.position='absolute';
+                    newball.textContent=getvalue;
+                    container.appendChild(newball);
+                    var currentTop=300;
+                    var currentLeft=(105*(intruction-1))+100;
+                    var newballTop=-50;
+                    newball.style.top=`${currentTop}px`;
+                    newball.style.left=`${currentLeft}px`;
+                    var UpInterval=setInterval(function(){
+                        if(currentTop>newballTop){
+                            currentTop-=2;
+                            newball.style.top=`${currentTop}px`;
+                        }else{
+                            clearInterval(UpInterval);
+                            newball.remove();
+                            bt+=1;
+                        }
+                    },50);
+                }
+                else{
+                    textpos.textContent=intruction+"番目のポールにはボールがありません";
+                }
+            }
+            function balljudge(intruction){
+                console.log("今からjudgeを行います");
+                const poll=polls[intruction-1];
+                t1=poll.children[0].textContent;
+                t2=poll.children[1].textContent;
+                t3=poll.children[2].textContent;
+                t4=poll.children[3].textContent;
+                if(t1==t2&&t2==t3&&t3==t4){
+                    btcon.children[intruction-1].disabled=true; 
+                    clear+=1;
+                }
+                if(clear>=6){
+                    textpos.textContent="おめでとうございます。クリアしました";
+                    document.querySelectorAll(".button").forEach(button=>button.disabled=true);
+                }
+            }
+        </script>
+    </body>
+</html>

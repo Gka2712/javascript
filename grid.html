@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Dynamic grid</title>
+        <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+        <style>
+            .titlepos{
+                text-align:center;
+                margin-top:2%;
+                font-size:30px;
+            }
+            .buttonpos{
+                margin-left: 40%;
+            }
+            .tablepos{
+                margin-left:30%; 
+            }
+            table,td{
+                border:1px solid black;
+            }
+            td{
+                width: 50px;
+                height:50px;
+                text-align:center;
+            }
+            .resizable{
+                overflow:hidden;
+            }
+            .editable{
+                display:block;
+                width:100%;
+                height:100%;
+                border:none;
+                text-align:center;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="titlepos">grid editer</div>
+        <button class="buttonpos" onclick="addColumn()">列を追加</button>
+        <button onclick="addRow()">行を追加</button>
+        <button onclick="removeColumn()">列を削除</button>
+        <button onclick="removeRow()">行を削除</button>
+       <table class="tablepos" id="grid">
+            <tr>
+                <td class="resizable"></td>
+                <td class="resizable"></td>
+            </tr>
+            <tr>
+                <td class="resizable"></td>
+                <td class="resizable"></td>
+            </tr>
+       </table> 
+       <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+       <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+       <script>
+            makeresizable();
+            function addColumn(){
+                let table=document.getElementById('grid');
+                for(let row of table.rows){
+                    let newCell=row.insertCell(-1);
+                    $(newCell).addClass('resizable');
+                }
+                makeresizable();
+            }
+            function addRow(){
+                let table=document.getElementById('grid');
+                let newRow=table.insertRow(-1);
+                for(let i=0;i<table.rows[0].cells.length;i++){
+                    let newCell=newRow.insertCell(-1);
+                    $(newCell).addClass("resizable");
+                }
+                makeresizable();
+            }
+            function removeColumn(){
+                let table=document.getElementById('grid');
+                if(table.rows[0].cells.length>1){
+                    for(let row of table.rows){
+                        row.deleteCell(-1);
+                    }
+                }
+
+            }
+            function removeRow(){
+                let table=document.getElementById('grid');
+                if(table.rows.length>1){
+                    table.deleteRow(-1);
+                }
+            }
+            function makeresizable(){
+                $('.resizable').resizable({
+                    handles:'e, s, se'
+                });
+            }
+            function makeEditable(cell){
+                cell.addEventListener('click',function(){
+                    let currentText=cell.textContent;
+                    let input =document.createElement('input');
+                    input.type='text';
+                    input.className='editable';
+                    input.innerHTML='';
+                    cell.appendChild(input);
+                    input.focus();
+                    input.addEventListener('blur',function(){
+                        cell.textContent=input.value;
+                        makeresizable();
+                    });
+                    input.addEventListener('keypress',function(e){
+                        if(e.key==='Enter'){
+                            cell.textContent=input.value;
+                            makeresizable();
+                        }
+                    });
+                    makeresizable();
+                });
+            }
+            document.querySelectorAll('#grid td').forEach(makeEditable);
+       </script> 
+    </body>
+
+</html>
