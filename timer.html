@@ -1,0 +1,139 @@
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>タイマー</title>
+        <style>
+            .titlepos{
+                margin-top:5%;
+                margin-left:40%;
+            }
+            .timerpos{
+                margin-top:1%;
+                margin-left:38%;
+                font-size:40px;
+            }
+            .button{
+                background-color: green;
+                height:100px;
+                width:100px;
+                margin-right:10%;
+                border-radius: 50%;
+            }
+            .buttonpos{
+                margin-top:3%;
+                margin-left:35%;
+                position:flex;
+            }
+            .laptime{
+                display:flex;
+                flex-direction: column;
+                margin-top:5%;
+            }
+            .laprecord{
+                font-size:40px;
+                margin-left:35%;
+                border-top: 1px solid #333;
+                width:350px;
+            }
+        </style>
+    </head>
+    <body>
+        <h2 class="titlepos">ストップウォッチ</h2>
+        <div id="timer" class="timerpos">00:00:00.00</div>
+        <div class="buttonpos">
+            <button id="timeman" class="button" onclick="timefunction()">start</button>
+            <button id="timefunc" class="button" onclick="timerfunction2()">lap</button>
+        </div>
+        <div class="laptime"></div>
+        <script>
+            let mseconds=0;
+            let seconds=0;
+            let minutes=0;
+            let hours=0;
+            let interval;
+            let timeflag=0;
+            let timerflag2=0;
+            document.getElementById("timefunc").disabled=true;
+            function timefunction(){
+                console.log("timefunctionです");
+                if(timeflag==0){
+                    timerstart();    
+                }
+                else{
+                    timerstop();
+                }
+            }
+            function timerstart(){
+                timeflag=1;
+                timerflag2=0;
+                document.getElementById("timeman").textContent="stop";
+                document.getElementById("timefunc").textContent="lap";
+                document.getElementById("timefunc").disabled=false;
+                interval=setInterval(updatetimer,10);
+            }
+            function timerstop(){
+                timeflag=0;
+                timerflag2=1;
+                document.getElementById("timeman").textContent="start";
+                document.getElementById("timefunc").textContent="reset";
+                clearInterval(interval);
+                
+            }
+            function updatetimer(){
+                mseconds++;
+                if(mseconds==99){
+                    seconds++;
+                    mseconds=0;
+                }
+                if(seconds==60){
+                    minutes++;
+                    seconds=0;
+                }
+                if(minutes==60){
+                    hours++;
+                    minutes=0;
+                }
+                const formatedmseconds=mseconds.toString().padStart(2,"0");
+                const formatedseconds=seconds.toString().padStart(2,"0");
+                const formatedminutes=minutes.toString().padStart(2,"0");
+                const formatedhours=hours.toString().padStart(2,"0");
+                document.getElementById("timer").textContent=`${formatedhours}:${formatedminutes}:${formatedseconds}.${formatedmseconds}`;   
+            }
+            function timerfunction2(){
+                if(timerflag2==0){
+                    
+                    timerlap();
+                }
+                else{
+                    timerreset();
+                }
+            }
+            function timerlap(){
+                
+                const rtime=document.createElement("div");
+                rtime.classList.add('laprecord');
+                const laptime=document.getElementById("timer").textContent;
+                rtime.textContent=laptime;
+                console.log(laptime);
+                document.querySelector(".laptime").appendChild(rtime);
+
+            }
+            function timerreset(){
+                console.log("resetします");
+                mseconds=0;
+                seconds=0;
+                minutes=0;
+                hours=0;
+                const formatedmseconds=mseconds.toString().padStart(2,"0");
+                const formatedseconds=seconds.toString().padStart(2,"0");
+                const formatedminutes=minutes.toString().padStart(2,"0");
+                const formatedhours=hours.toString().padStart(2,"0");
+                document.getElementById("timer").textContent=`${formatedhours}:${formatedminutes}:${formatedseconds}.${formatedmseconds}`; 
+                document.getElementById("timefunc").textContent="lap";
+                document.getElementById("timefunc").disabled=true;  
+                document.querySelectorAll('.laprecord').forEach(record=>record.remove())
+            }
+        </script>
+    </body>
+
+</html>

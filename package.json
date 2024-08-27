@@ -1,0 +1,20 @@
+{
+  "name": "javascript_game",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "devDependencies": {
+    "@eslint/js": "^9.9.1",
+    "eslint": "^9.9.1",
+    "eslint-plugin-css-modules": "^2.12.0",
+    "eslint-plugin-html": "^8.1.1",
+    "globals": "^15.9.0",
+    "htmllint": "^0.8.0"
+  }
+}

@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>タイピング</title>
+    <style>
+        h1{
+            text-align: center;
+        }
+        .textpos{
+            margin-top:10%;
+        }
+        .text{
+            font-size:40px;
+            margin-left:30%;
+        }
+        .text span {
+            color: black;
+            transition: color 0.3s;
+        }
+        .text .highlight {
+            color: red;
+        }
+        button{
+            margin-left:35%;
+            width:60px;
+            height:50px;
+        }
+        .rtext{
+            margin-left:35%;
+            font-size:30px;
+        }
+        .result{
+            display:flex;
+            flex-direction:column;
+            margin-top:5%
+        }
+    </style>
+</head>
+<body>
+    <h1>タイピングサイト</h1>
+    <div class="textpos text" id="supporttext">開始</div>
+    <div class="text" id="readtext">ここに文章が表示されます</div>
+    <button id="readbutton" onclick="start()">開始</button>
+    <div class="result"></div>
+    <script>
+        const typingString=["私は学生エンジニアです","私は映画を見るのが好きです","もう少しで社会人だ","今年はいい年になりそうだ","このコードはHTMLで作成しています"];
+        const typingString2=["watashihagakuseiennjiniadesu","watashihaeigawomirunogasukidesu","mousukosidesyakaijinda","kotoshihaiitosininarisouda","konoko-dohahtmldesakuseisiteimasu"];
+        let mistype=0;
+        let seconds=0;
+        let interval;
+        function start() {
+            let j=0;
+            
+            function displayNextString(){
+                interval=setInterval(updatetimer,1000);
+                if(j>=5){
+                    console.log(mistype);
+                    console.log(seconds);
+                    const text1=document.createElement("div");
+                    text1.classList.add('rtext');
+                    text1.textContent="ミス:"+mistype+"回";
+                    document.querySelector(".result").appendChild(text1);
+                    const text2=document.createElement("div");
+                    text2.classList.add('rtext');
+                    text2.textContent="時間:"+seconds+"秒";
+                    document.querySelector(".result").appendChild(text2);
+                    return;
+                }
+                const textelement = document.getElementById('readtext');
+                const textelement2 =document.getElementById('supporttext');
+                const text = textelement.textContent;
+                textelement.textContent = '';  // 元のテキストをクリア
+                textelement2.textContent=typingString[j];
+                const spans = [];
+                // テキストを一文字ずつ<span>タグで囲んで非表示で追加
+                for (let i = 0; i < typingString2[j].length; i++) {
+                    
+                    const span = document.createElement('span');
+                    span.textContent = typingString2[j][i];
+                    textelement.appendChild(span);
+                    spans.push(span);
+                }
+                
+                let index = 0;
+                document.addEventListener('keydown',function onkeyPress(event){
+                    if(event.key===typingString2[j][index]){
+                        spans[index].classList.add("highlight");
+                        index++;
+                        if(index>=spans.length){
+                            document.removeEventListener('keydown',onkeyPress);
+                            if(j<5){
+                                j++;
+                                displayNextString();
+                            }
+                        }
+                    }
+                    else{
+                        mistype++;
+                    }
+                });
+            }
+            function updatetimer(){
+                seconds++;
+            }
+            displayNextString();
+        }
+   </script> 
+</body>
+</html>

@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>文字数カウント</title>
+        <style>
+            .titlepos{
+                margin-top:5%;
+                margin-left:40%;
+                font-size:30px;
+            }
+            .tareapos{
+                margin-top:1%;
+                margin-left:38%;
+            }
+            .btpos{
+                margin-top:1%;
+                margin-left:45%;
+            }
+            #chcountpro{
+                margin-top:2%;
+                margin-left:45%;
+            }
+            .table{
+                width:40%;
+                border-collapse: collapse;
+            }
+            tr,td{
+                border:1px solid #000;
+                width:50%;
+            }
+            .e1{
+                font-size:10px
+            }
+            .e2{
+                font-size:20px
+            }
+        </style>
+    </head>
+    <body>
+        <h2 class="titlepos">文字数カウント</h2>
+        <textarea id="tarea" class="tareapos" rows="5" cols="40"></textarea>
+        <div class="btpos">
+            <button onclick="textareafunc()">文字数カウント</button>
+            <button onclick="textareareset()">リセット</button>
+        </div>
+        <div id="chcountpro"></div>
+        <script>
+            const textarea=document.getElementById("tarea");
+            const charcount=document.getElementById("chcountpro")
+            function textareafunc(){
+                const existingTable=document.querySelector('.table');
+                if(existingTable){
+                    existingTable.remove();
+                }
+                let charbox=[[0,0],[0,0],[0,0],[0,0]];
+                let charindex=[["全ての文字数","文字数(空白有)"],["文字数(空白無)","空白数"],["段落数","文章数"],["単語数","原稿用紙枚数"]];
+                let allnum=textarea.value.length;
+                let text=textarea.value;
+                let blanknum=0;
+                let breaknum=0;
+                let sentencenum=0;
+                let wordlength=0;
+                let wordnum=0;
+                for(i=0;i<textarea.value.length;i++){
+                    if(text[i]==' '){
+                        wordlength=0;
+                        blanknum++;
+                    }   
+                    else if(text[i]=='\n'){
+                        wordlength=0;
+                        breaknum++;
+                    }
+                    else if(text[i]=='.'||text[i]=='。'){
+                        sentencenum++;
+                    }
+                    else{
+                        if(wordlength==0){
+                            wordnum++;
+                        }
+                        wordlength++;
+                    }
+                }
+                charbox[0][0]=allnum;
+                charbox[0][1]=allnum;
+                charbox[1][0]=allnum-blanknum;
+                charbox[1][1]=blanknum;
+                charbox[2][0]=breaknum;
+                charbox[2][1]=sentencenum;
+                charbox[3][0]=wordnum;
+                charbox[3][1]=(((wordnum-1)/400)+1).toFixed();
+                console.log(allnum+" "+blanknum+" "+breaknum);
+                const table=document.createElement('table');
+                table.classList.add('table');
+                for(let i=0;i<4;i++){
+                    const tr=document.createElement('tr');
+                    tr.classList.add('tr');
+                    for(let j=0;j<2;j++){
+                        const td=document.createElement('td');
+                        td.classList.add('td');
+                        const e1=document.createElement('div');
+                        e1.classList.add('e1');
+                        e1.textContent=`${charindex[i][j]}`
+                        td.appendChild(e1);
+                        const e2=document.createElement('div');
+                        e2.classList.add('e2');
+                        e2.textContent=`${charbox[i][j]}`;
+                        td.appendChild(e2);
+                        tr.appendChild(td);
+                    }
+                    table.appendChild(tr);
+                }
+                charcount.appendChild(table);
+            }
+            function textareareset(){
+                const existingTable=document.querySelector('.table');
+                if(existingTable){
+                    existingTable.remove();
+                }
+            }
+        </script>
+    </body>
+</html>
